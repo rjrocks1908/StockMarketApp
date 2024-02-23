@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.haxon.stockmarketapp"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -85,8 +85,11 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.2.2")
 
     //Dagger - Hilt
-    implementation("com.google.dagger:hilt-android:2.48.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.48.1")
+    implementation("com.google.dagger:hilt-android:2.50")
+    kapt("com.google.dagger:hilt-android-compiler:2.50")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    kapt("androidx.hilt:hilt-compiler:1.2.0")
 
     // Retrofit
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")

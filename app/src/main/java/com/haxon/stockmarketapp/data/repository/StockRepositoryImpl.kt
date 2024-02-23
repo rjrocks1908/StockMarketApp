@@ -2,10 +2,13 @@ package com.haxon.stockmarketapp.data.repository
 
 import com.haxon.stockmarketapp.data.csv.CSVParser
 import com.haxon.stockmarketapp.data.local.StockDatabase
+import com.haxon.stockmarketapp.data.mapper.toCompanyInfo
 import com.haxon.stockmarketapp.data.mapper.toCompanyListing
 import com.haxon.stockmarketapp.data.mapper.toCompanyListingEntity
 import com.haxon.stockmarketapp.data.remote.StockApi
+import com.haxon.stockmarketapp.domain.model.CompanyInfo
 import com.haxon.stockmarketapp.domain.model.CompanyListing
+import com.haxon.stockmarketapp.domain.model.IntradayInfo
 import com.haxon.stockmarketapp.domain.repository.StockRepository
 import com.haxon.stockmarketapp.util.Resource
 import kotlinx.coroutines.flow.Flow
@@ -17,7 +20,8 @@ import javax.inject.Singleton
 class StockRepositoryImpl @Inject constructor(
     private val api: StockApi,
     private val db: StockDatabase,
-    private val companyListingParser: CSVParser<CompanyListing>
+    private val companyListingParser: CSVParser<CompanyListing>,
+    private val intradayInfoParser: CSVParser<IntradayInfo>,
 ) : StockRepository {
 
     private val dao = db.dao
@@ -61,6 +65,31 @@ class StockRepositoryImpl @Inject constructor(
                 ))
                 emit(Resource.Loading(false))
             }
+        }
+    }
+
+    override suspend fun getIntradayInfo(symbol: String): Resource<List<IntradayInfo>> {
+        return try {
+            val response = api.getIntradayInfo(symbol)
+            val results = intradayInfoParser.parse(response.byteStream())
+            Resource.Success(results)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Resource.Error(
+                message = "Couldn't load intraday info"
+            )
+        }
+    }
+
+    override suspend fun getCompanyInfo(symbol: String): Resource<CompanyInfo> {
+        return try {
+            val result = api.getCompanyInfo(symbol)
+            Resource.Success(result.toCompanyInfo())
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Resource.Error(
+                message = "Couldn't load company info"
+            )
         }
     }
 
